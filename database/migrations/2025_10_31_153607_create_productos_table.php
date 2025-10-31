@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('codigo')->unique();
             $table->string('descripcion');
             $table->decimal('precio', 10, 2)->nullable();
+            $table->decimal('desc1', 10,2)->nullable();
+            $table->decimal('desc2', 10,2)->nullable();
             $table->integer('stock');
             $table->foreignId('marca_id')->contrained('marcas')->cascadeOnDelete();
             $table->timestamps();

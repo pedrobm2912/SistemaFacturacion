@@ -17,6 +17,8 @@
         "vite": "^6.0.11"
     },
     "dependencies": {
-        "datatables.net-dt": "^2.3.4"
+        "datatables.net": "^2.3.4",
+        "datatables.net-dt": "^2.3.4",
+        "jquery": "^3.7.1"
     }
 }
