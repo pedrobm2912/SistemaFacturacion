@@ -11,11 +11,14 @@ class Cotizacion extends Model
     protected $fillable = [
         'cod_cotizacion',
         'estado',
-        'subtotal',
         'igv',
         'total',
         'dias_valido',
         'cliente_id',
         'user_id'
     ];
+
+    public function cotizacion_detalles() {
+        return $this->hasMany(CotizacionDetalle::class, 'cotizacion_id', 'id');
+    } 
 }

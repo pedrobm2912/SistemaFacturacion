@@ -18,13 +18,13 @@
             </div>
 
             <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-5">
 
                 <a href="{{ route('proceso.cotizacion') }}">
+                    <span id="contador-carrito" class="contador-carrito"></span>
                     <svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
-                        <title>shopping_cart</title>
-                        <desc>Created with Sketch.</desc>
+
+                        <title>Carrito</title>
                         <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                             <g id="Rounded" transform="translate(-677.000000, -464.000000)">
                                 <g id="Action" transform="translate(100.000000, 100.000000)">
@@ -119,3 +119,53 @@
         </div>
     </div>
 </nav>
+
+<style>
+.carrito-container {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+}
+
+.contador-carrito {
+  position: absolute;
+  top: 6px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 50%;
+  display: none;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1;
+  transform: scale(1);
+  transition: transform 0.2s ease;
+}
+
+.contador-carrito.bump {
+  transform: scale(1.3);
+}
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contadorCarrito = document.getElementById('contador-carrito');
+
+        function actualizarContador() {
+            const carrito = JSON.parse(localStorage.getItem('carrito'));
+
+            if (carrito && carrito.length > 0) {
+                contadorCarrito.textContent = carrito.length;
+                contadorCarrito.style.display = 'inline';
+            } else {
+                contadorCarrito.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('actualizarCarrito', actualizarContador);
+        actualizarContador();
+    });
+</script>
+

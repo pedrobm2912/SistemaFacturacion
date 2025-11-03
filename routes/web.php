@@ -22,7 +22,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
     Route::post('/productos', [ProductoController::class, 'store'])->name('productos.store');
 
-    Route::get('/proceso/cotizacion', [CotizacionController::class, 'index'])->name('proceso.cotizacion');
+    Route::get('/cotizacion/proceso', [CotizacionController::class, 'index'])->name('proceso.cotizacion');
+    Route::post('/cotizacion/proceso', [CotizacionController::class, 'store'])->name('procesar.cotizacion');
 });
 
 require __DIR__.'/auth.php';

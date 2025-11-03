@@ -14,7 +14,11 @@ class CotizacionDetalle extends Model
         'desc1',
         'desc2',
         'subtotal',
-        'igv',
-        'producto_id'
+        'producto_id',
+        'cotizacion_id'
     ];
+
+    public function cotizacion() {
+        return $this->belongsTo(Cotizacion::class, 'cotizacion_id', 'id');
+    }
 }

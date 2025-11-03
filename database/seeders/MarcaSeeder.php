@@ -22,10 +22,10 @@ class MarcaSeeder extends Seeder
             'nombre' => 'Xiaomi',
             'abreviatura' => 'XMI'
         ]);
-        
+
         Marca::create([
             'nombre' => 'Dell',
-            'abreviatura' => 'DL'
+            'abreviatura' => 'DLL'
         ]);
 
         Marca::create([

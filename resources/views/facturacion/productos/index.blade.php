@@ -82,6 +82,7 @@
                             <th>#</th>
                             <th>Código</th>
                             <th>Descripción</th>
+                            <th>Marca</th>
                             <th>Precio</th>
                             <th></th>
                         </tr>
@@ -92,6 +93,7 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $producto->codigo }}</td>
                                 <td>{{ $producto->descripcion }}</td>
+                                <td>{{ $producto->marca->nombre }}</td>
                                 <td>{{ $producto->precio }}</td>
                                 <td>
                                     <x-dropdown align="left" width="48">
@@ -160,6 +162,8 @@
                     }
 
                     localStorage.setItem('carrito', JSON.stringify(carrito))
+                    document.dispatchEvent(new Event('actualizarCarrito'));
+
                 })
             })
         })

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->decimal('desc1', 10, 2);
             $table->decimal('desc2', 10, 2);
             $table->decimal('subtotal', 10, 2);
-            $table->decimal('igv', 10, 2);
             $table->foreignId('producto_id')->contrained('productos')->cascadeOnDelete();
+            $table->foreignId('cotizacion_id')->contrained('cotizaciones')->cascadeOnDelete();
             $table->timestamps();
         });
     }

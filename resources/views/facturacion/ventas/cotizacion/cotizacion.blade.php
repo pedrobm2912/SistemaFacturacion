@@ -6,57 +6,98 @@
             </h2>
         </x-slot>
 
-        <div class="px-8">
-            <div class="max-w-full mx-auto sm:px-6 lg:px-8 bg-white shadow-sm sm:rounded-lg p-4">
-                <table id="tablaCotizacion" class="display w-full">
-                    <thead>
-                        <tr class="text-sm">
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm"></tbody>
-                    <tfoot>
-                        <tr class="text-sm">
-                            <th colspan="4" class="text-end">TOTAL GENERAL:</th>
-                            <th id="totalGeneral">0.00</th>
-                            <th></th>
-                        </tr>
-                        <tr class="text-sm">
-                            <th colspan="4" class="text-end">IGV:</th>
-                            <th id="igv">0.00</th>
-                            <th></th>
-                        </tr>
-                        <tr class="text-sm">
-                            <th colspan="4" class="text-end">Total con IGV:</th>
-                            <th id="totalConIgv">0.00</th>
-                            <th></th>
-                        </tr>
-                    </tfoot>
-                </table>
+        <form action="{{ route('procesar.cotizacion') }}" method="POST" id="form-cotizacion">
+            @csrf
+            <div class="px-8">
+                <div class="flex flex-row gap-4 max-w-full mx-auto sm:px-6 lg:px-8 bg-white shadow-sm sm:rounded-lg p-4">
+                    <div class="flex gap-2 text-sm items-center">
+                        <label for="cliente_id">Cliente:</label>
+                        <select class="js-example-basic-single text-sm rounded-lg" name="cliente_id">
+                            <option value="">--Escoger un cliente--</option>
+                            @foreach($clientes as $cliente)
+                                <option value="{{ $cliente->id }}">{{ $cliente->nombres }} {{ $cliente->apellidos }} || {{ $cliente->ruc }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                <button class="px-3 py-2 bg-black/100 rounded-lg text-sm text-white">Cotizar</button>
+                    <div class="flex gap-2 text-sm justify-center items-center">
+                        <label for="dias_valido">Días válidos:</label>
+                        <select name="dias_valido" class="rounded-lg text-sm">
+                            <option value="5">5 días</option>
+                            <option value="10">10 días</option>
+                            <option value="30">30 días</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="max-w-full mx-auto sm:px-6 lg:px-8 bg-white shadow-sm sm:rounded-lg p-4">
+                    <table id="tablaCotizacion" class="display w-full">
+                        <thead>
+                            <tr class="text-sm">
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm"></tbody>
+                        <tfoot>
+                            <tr class="text-sm">
+                                <th colspan="4" class="text-end">TOTAL GENERAL:</th>
+                                <th id="totalGeneral">0.00</th>
+                                <th></th>
+                            </tr>
+                            <tr class="text-sm">
+                                <th colspan="4" class="text-end">IGV:</th>
+                                <th id="igv">0.00</th>
+                                <th></th>
+                            </tr>
+                            <tr class="text-sm">
+                                <th colspan="4" class="text-end">Total con IGV:</th>
+                                <th id="totalConIgv">0.00</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    {{-- input oculto para enviarlo al backend --}}
+                    <input type="hidden" name="total_general" id="input-total-general">
+                    <input type="hidden" name="total_con_igv" id="input-total-con-igv">
+                    <input type="hidden" name="igv" id="input-igv">
+
+                    <button class="px-3 py-2 bg-black/100 rounded-lg text-sm text-white" type="submit">Cotizar</button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 
    @push('scripts')
         <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css" />
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
         <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
 
-    @endpush
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+         <script>
+            $(document).ready(function() {
+                $('.js-example-basic-single').select2();
+            });
+        </script>
+    @endpush
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            let carrito = JSON.parse(localStorage.getItem('carrito')) || []
+
+            let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
             const tabla = new DataTable('#tablaCotizacion', {
                 data: carrito.map((item, index) => [
                     item.codigo || '-',
                     item.descripcion || '-',
-                    `<input type="number" class="precio form-control" value="${item.precio || 0}" min="0" step="0.01">`,
-                    `<input type="number" class="cantidad form-control" value="${item.cantidad || 1}" min="1">`,
-                    `<input type="text" class="subtotal form-control" value="" readonly>`,
-                    `<button class="eliminar btn btn-danger" data-index="${index}">❌</button>`
+                    `
+                    <input type="hidden" name="productos_id[]" value="${item.id}">
+                    <input type="number" name="precios[]" class="precio form-control" value="${item.precio || 0}" min="0" step="0.01">
+                    `,
+                    `<input type="number" name="cantidades[]" class="cantidad form-control" value="${item.cantidad || 1}" min="1">`,
+                    `<input type="text" name="subtotales[]" class="subtotal form-control" value="0.00" readonly>`,
+                    `<button type="button" class="eliminar btn btn-danger" data-index="${index}">❌</button>`
                 ]),
                 columns: [
                     { title: "Código" },
@@ -69,23 +110,19 @@
                 paging: false,
                 searching: false,
                 info: false,
-                language: {
-                    url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
-                },
+                language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json" },
                 initComplete: function () {
-                    document.querySelectorAll('#tablaCotizacion tbody tr').forEach(fila => {
-                        calcularSubtotal(fila)
-                    });
-                    actualizarTotalGeneral()
-                    calcularIgv()
-                    calcularTotalConIgv()
+                    document.querySelectorAll('#tablaCotizacion tbody tr').forEach(fila => calcularSubtotal(fila));
+                    actualizarTotalGeneral();
+                    calcularIgv();
+                    calcularTotalConIgv();
                 }
             });
 
             function calcularSubtotal(fila) {
-                let precio = parseFloat(fila.querySelector('.precio').value) || 0
-                let cantidad = parseInt(fila.querySelector('.cantidad').value) || 0
-                let subtotal = precio * cantidad
+                const precio = parseFloat(fila.querySelector('.precio').value) || 0
+                const cantidad = parseInt(fila.querySelector('.cantidad').value) || 0
+                const subtotal = precio * cantidad
                 fila.querySelector('.subtotal').value = subtotal.toFixed(2)
             }
 
@@ -95,24 +132,32 @@
                     total += parseFloat(input.value) || 0
                 });
                 document.getElementById('totalGeneral').textContent = total.toFixed(2)
+
+                const inputTotal = document.getElementById('input-total-general')
+                if (inputTotal) inputTotal.value = total.toFixed(2)
             }
 
             function calcularIgv() {
-                let totalGeneral = parseFloat(document.getElementById('totalGeneral').textContent) || 0
-                let igv = totalGeneral * 0.18
+                const totalGeneral = parseFloat(document.getElementById('totalGeneral').textContent) || 0
+                const igv = totalGeneral * 0.18
                 document.getElementById('igv').textContent = igv.toFixed(2)
+
+                const inputIgv = document.getElementById('input-igv')
+                if (inputIgv) inputIgv.value = igv.toFixed(2)
             }
 
             function calcularTotalConIgv() {
-                let totalGeneral = parseFloat(document.getElementById('totalGeneral').textContent) || 0
-                let igv = parseFloat(document.getElementById('igv').textContent) || 0
-                let totalConIgv = totalGeneral + igv
+                const totalGeneral = parseFloat(document.getElementById('totalGeneral').textContent) || 0
+                const igv = parseFloat(document.getElementById('igv').textContent) || 0
+                const totalConIgv = totalGeneral + igv
                 document.getElementById('totalConIgv').textContent = totalConIgv.toFixed(2)
+                const inputTotalConIgv = document.getElementById('input-total-con-igv')
+                if (inputTotalConIgv) inputTotalConIgv.value = totalConIgv.toFixed(2)
             }
 
             document.querySelector('#tablaCotizacion').addEventListener('input', e => {
                 if (e.target.classList.contains('precio') || e.target.classList.contains('cantidad')) {
-                    let fila = e.target.closest('tr')
+                    const fila = e.target.closest('tr')
                     calcularSubtotal(fila)
                     actualizarTotalGeneral()
                     calcularIgv()
@@ -120,21 +165,28 @@
                 }
             });
 
-            actualizarTotalGeneral()
-            calcularIgv()
-            calcularTotalConIgv()
-
             document.querySelector('#tablaCotizacion').addEventListener('click', e => {
                 if (e.target.classList.contains('eliminar')) {
-                    let fila = e.target.closest('tr')
+                    const fila = e.target.closest('tr')
                     fila.remove()
-                    carrito = carrito.filter((_, i) => i != e.target.dataset.index)
-                    localStorage.setItem('carrito', JSON.stringify(carrito))
+                    const idx = parseInt(e.target.dataset.index);
+                    if (!isNaN(idx)) {
+                        carrito.splice(idx, 1)
+                        localStorage.setItem('carrito', JSON.stringify(carrito))
+                        document.dispatchEvent(new Event('actualizarCarrito'));
+                    }
                     actualizarTotalGeneral()
                     calcularIgv()
                     calcularTotalConIgv()
                 }
-            });
-        });
+            })
+
+            const form = document.getElementById('form-cotizacion')
+            if (!form) {
+                console.error('Formulario no encontrado.')
+                return
+            }
+            if (carrito) localStorage.removeItem('carrito')
+        })
     </script>
 </x-app-layout>
