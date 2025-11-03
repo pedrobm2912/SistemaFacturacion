@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CodeGenerator;
 use App\Models\Cliente;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
+use App\Models\Factura;
+use App\Models\FacturaDetalle;
 use App\Models\Producto;
 use Exception;
 use Illuminate\Http\Request;
@@ -13,6 +16,18 @@ use Illuminate\Support\Facades\DB;
 
 class CotizacionController extends Controller
 {
+    public function getCotizaciones() {
+
+        $cotizaciones = Cotizacion::with(['cotizacion_detalles', 'cliente'])->get();
+
+        // return $cotizaciones;
+
+        return view("facturacion.ventas.cotizacion.index", [
+            "cotizaciones" => $cotizaciones
+        ]);
+
+    }
+
     public function index() {
         $clientes = Cliente::get();
 
@@ -22,14 +37,12 @@ class CotizacionController extends Controller
     }
 
     public function store(Request $request) {
-        $productos = Producto::get();
-
         try {
 
             // return $request;
             DB::beginTransaction();
             $cotizacion = Cotizacion::create([
-                'cod_cotizacion' => $this->generateCodCotizacion(),
+                'cod_cotizacion' => CodeGenerator::generate('COT', Cotizacion::class, 'cod_cotizacion'),
                 'igv' => $request->igv,
                 'total' => $request->total_con_igv,
                 'dias_valido' => $request->dias_valido,
@@ -61,32 +74,38 @@ class CotizacionController extends Controller
             return redirect()->route('proceso.cotizacion')->with('success', 'Cotización creada exitosamente');
 
         } catch (Exception $e) {
-            dd($e->getMessage());
 
+            DB::rollBack();
+            // dd($e->getMessage());
             return redirect()->back()->with('error', $e->getMessage());
             // return redirect()->back()->with('error', 'Error interno del servidor');
 
         }
     }
 
-    private function generateCodCotizacion() {
+    public function changeStateCotizacion(Request $request, $cotizacion_id) {
         try {
 
-            $ultimaCot = Cotizacion::orderBy('id', 'desc')->first();
-            if ($ultimaCot) {
-                $ultimoNum = (int) substr($ultimaCot->cod_cotizacion, 4);
-                $nuevoNum = $ultimoNum + 1;
-            } else {
-                $nuevoNum = 1;
+            $cotizacion = Cotizacion::findOrFail($cotizacion_id);
+
+            $cotizacion->update([
+                'estado' => $request->estado
+            ]);
+
+            if ($cotizacion->estado == 0) {
+                $mensaje = 'anulada';
+            } else if ($cotizacion->estado == 1) {
+                $mensaje = 'cotizada';
+            } else if ($cotizacion->estado == 2) {
+                $mensaje = 'aceptada';
             }
 
-            $codCotizacion = 'COT-' . str_pad($nuevoNum, 6, '0', STR_PAD_LEFT);
-
-            return $codCotizacion;
+            return redirect()->back()->with('success', $cotizacion->cod_cotizacion . '' . $mensaje);
 
         } catch (Exception $e) {
 
-            throw new Exception('Hubo un error al generar código');
+            return redirect()->back()->with('error', $e->getMessage());
+            // return redirect()->back()->with('error', 'Error interno del servidor');
 
         }
     }

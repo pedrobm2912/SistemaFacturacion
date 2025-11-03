@@ -11,7 +11,6 @@ class Factura extends Model
     protected $fillable = [
         'cod_factura',
         'estado',
-        'subtotal',
         'igv',
         'moneda',
         'total',

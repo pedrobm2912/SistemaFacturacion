@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CotizacionController;
+use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -22,8 +23,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
     Route::post('/productos', [ProductoController::class, 'store'])->name('productos.store');
 
+    Route::get('/cotizacion', [CotizacionController::class, 'getCotizaciones'])->name('cotizaciones.index');
     Route::get('/cotizacion/proceso', [CotizacionController::class, 'index'])->name('proceso.cotizacion');
     Route::post('/cotizacion/proceso', [CotizacionController::class, 'store'])->name('procesar.cotizacion');
+    Route::patch('/cotizacion/{cotizacion_id}', [CotizacionController::class, 'changeStateCotizacion'])->name('changeState.cotizacion');
+
+    Route::get('/facturas/{cotizacion_id}', [FacturaController::class, 'index'])->name('proceso.factura');
+    Route::post('/facturas/{cotizacion_id}', [CotizacionController::class, 'cotiToFact'])->name('cotizacion.factura');
 });
 
 require __DIR__.'/auth.php';

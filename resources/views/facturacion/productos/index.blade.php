@@ -83,6 +83,7 @@
                             <th>Código</th>
                             <th>Descripción</th>
                             <th>Marca</th>
+                            <th>Stock</th>
                             <th>Precio</th>
                             <th></th>
                         </tr>
@@ -94,7 +95,8 @@
                                 <td>{{ $producto->codigo }}</td>
                                 <td>{{ $producto->descripcion }}</td>
                                 <td>{{ $producto->marca->nombre }}</td>
-                                <td>{{ $producto->precio }}</td>
+                                <td>{{ $producto->stock }}</td>
+                                <td>S/{{ $producto->precio }}</td>
                                 <td>
                                     <x-dropdown align="left" width="48">
                                         <x-slot name="trigger">
