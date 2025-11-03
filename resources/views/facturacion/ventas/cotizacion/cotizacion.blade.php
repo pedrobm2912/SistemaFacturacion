@@ -8,20 +8,23 @@
 
         <div class="px-8">
             <div class="max-w-full mx-auto sm:px-6 lg:px-8 bg-white shadow-sm sm:rounded-lg p-4">
-            <table id="tablaCotizacion" class="display w-full">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Descripción</th>
-                        <th>Precio (S/)</th>
-                        <th>Cantidad</th>
-                        <th>Subtotal (S/)</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+                <table id="tablaCotizacion" class="display w-full">
+                    <thead>
+                        <tr class="text-sm">
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm"></tbody>
+                    <tfoot>
+                        <tr class="text-sm">
+                            <th colspan="4" class="text-end">TOTAL GENERAL:</th>
+                            <th id="totalGeneral">0.00</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <button class="px-3 py-2 bg-black/100 rounded-lg text-sm text-white">Cotizar</button>
+            </div>
         </div>
     </div>
 
@@ -34,7 +37,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            let carrito = JSON.parse(localStorage.getItem('carrito')) || []
+            let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
             const tabla = new DataTable('#tablaCotizacion', {
                 data: carrito.map((item, index) => [
@@ -58,27 +61,49 @@
                 info: false,
                 language: {
                     url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
+                },
+                initComplete: function () {
+                    document.querySelectorAll('#tablaCotizacion tbody tr').forEach(fila => {
+                        calcularSubtotal(fila);
+                    });
+                    actualizarTotalGeneral();
                 }
-            })
+            });
+
+            function calcularSubtotal(fila) {
+                let precio = parseFloat(fila.querySelector('.precio').value) || 0;
+                let cantidad = parseInt(fila.querySelector('.cantidad').value) || 0;
+                let subtotal = precio * cantidad;
+                fila.querySelector('.subtotal').value = subtotal.toFixed(2);
+            }
+
+            function actualizarTotalGeneral() {
+                let total = 0;
+                document.querySelectorAll('.subtotal').forEach(input => {
+                    total += parseFloat(input.value) || 0;
+                });
+                document.getElementById('totalGeneral').textContent = total.toFixed(2);
+            }
 
             document.querySelector('#tablaCotizacion').addEventListener('input', e => {
                 if (e.target.classList.contains('precio') || e.target.classList.contains('cantidad')) {
-                    let fila = e.target.closest('tr')
-                    let precio = parseFloat(fila.querySelector('.precio').value) || 0
-                    let cantidad = parseInt(fila.querySelector('.cantidad').value) || 0
-                    let subtotal = precio * cantidad
-                    fila.querySelector('.subtotal').value = subtotal.toFixed(2)
+                    let fila = e.target.closest('tr');
+                    calcularSubtotal(fila);
+                    actualizarTotalGeneral();
                 }
-            })
+            });
+
+            actualizarTotalGeneral();
 
             document.querySelector('#tablaCotizacion').addEventListener('click', e => {
                 if (e.target.classList.contains('eliminar')) {
-                    let fila = e.target.closest('tr')
-                    fila.remove()
-
-                    console.log(carrito)
+                    let fila = e.target.closest('tr');
+                    fila.remove();
+                    carrito = carrito.filter((_, i) => i != e.target.dataset.index);
+                    localStorage.setItem('carrito', JSON.stringify(carrito));
+                    actualizarTotalGeneral();
                 }
-            })
-        })
+            });
+        });
     </script>
 </x-app-layout>
