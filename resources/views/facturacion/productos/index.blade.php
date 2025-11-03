@@ -1,9 +1,9 @@
 <x-app-layout>
     <div class="py-10">
         <x-slot name="header">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{-- <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 CONSULTAS
-            </h2>
+            </h2> --}}
 
             <button command="show-modal" commandfor="dialog" class="rounded-md bg-white/10 text-sm font-semibold text-black inset-ring inset-ring-white/5 hover:bg-white/20">
                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 14 14">
@@ -78,7 +78,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-4">
                 <table id="myTable" class="display w-full">
                     <thead>
-                        <tr>
+                        <tr class="text-sm">
                             <th>#</th>
                             <th>Código</th>
                             <th>Descripción</th>
@@ -88,7 +88,7 @@
                     </thead>
                     <tbody>
                         @foreach($productos as $producto)
-                            <tr>
+                            <tr class="text-sm">
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $producto->codigo }}</td>
                                 <td>{{ $producto->descripcion }}</td>

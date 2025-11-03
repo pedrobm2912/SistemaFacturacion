@@ -20,6 +20,16 @@
                             <th id="totalGeneral">0.00</th>
                             <th></th>
                         </tr>
+                        <tr class="text-sm">
+                            <th colspan="4" class="text-end">IGV:</th>
+                            <th id="igv">0.00</th>
+                            <th></th>
+                        </tr>
+                        <tr class="text-sm">
+                            <th colspan="4" class="text-end">Total con IGV:</th>
+                            <th id="totalConIgv">0.00</th>
+                            <th></th>
+                        </tr>
                     </tfoot>
                 </table>
 
@@ -37,7 +47,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+            let carrito = JSON.parse(localStorage.getItem('carrito')) || []
 
             const tabla = new DataTable('#tablaCotizacion', {
                 data: carrito.map((item, index) => [
@@ -64,44 +74,65 @@
                 },
                 initComplete: function () {
                     document.querySelectorAll('#tablaCotizacion tbody tr').forEach(fila => {
-                        calcularSubtotal(fila);
+                        calcularSubtotal(fila)
                     });
-                    actualizarTotalGeneral();
+                    actualizarTotalGeneral()
+                    calcularIgv()
+                    calcularTotalConIgv()
                 }
             });
 
             function calcularSubtotal(fila) {
-                let precio = parseFloat(fila.querySelector('.precio').value) || 0;
-                let cantidad = parseInt(fila.querySelector('.cantidad').value) || 0;
-                let subtotal = precio * cantidad;
-                fila.querySelector('.subtotal').value = subtotal.toFixed(2);
+                let precio = parseFloat(fila.querySelector('.precio').value) || 0
+                let cantidad = parseInt(fila.querySelector('.cantidad').value) || 0
+                let subtotal = precio * cantidad
+                fila.querySelector('.subtotal').value = subtotal.toFixed(2)
             }
 
             function actualizarTotalGeneral() {
                 let total = 0;
                 document.querySelectorAll('.subtotal').forEach(input => {
-                    total += parseFloat(input.value) || 0;
+                    total += parseFloat(input.value) || 0
                 });
-                document.getElementById('totalGeneral').textContent = total.toFixed(2);
+                document.getElementById('totalGeneral').textContent = total.toFixed(2)
+            }
+
+            function calcularIgv() {
+                let totalGeneral = parseFloat(document.getElementById('totalGeneral').textContent) || 0
+                let igv = totalGeneral * 0.18
+                document.getElementById('igv').textContent = igv.toFixed(2)
+            }
+
+            function calcularTotalConIgv() {
+                let totalGeneral = parseFloat(document.getElementById('totalGeneral').textContent) || 0
+                let igv = parseFloat(document.getElementById('igv').textContent) || 0
+                let totalConIgv = totalGeneral + igv
+                document.getElementById('totalConIgv').textContent = totalConIgv.toFixed(2)
             }
 
             document.querySelector('#tablaCotizacion').addEventListener('input', e => {
                 if (e.target.classList.contains('precio') || e.target.classList.contains('cantidad')) {
-                    let fila = e.target.closest('tr');
-                    calcularSubtotal(fila);
-                    actualizarTotalGeneral();
+                    let fila = e.target.closest('tr')
+                    calcularSubtotal(fila)
+                    actualizarTotalGeneral()
+                    calcularIgv()
+                    calcularTotalConIgv()
                 }
             });
 
-            actualizarTotalGeneral();
+            actualizarTotalGeneral()
+            calcularIgv()
+            calcularTotalConIgv()
 
             document.querySelector('#tablaCotizacion').addEventListener('click', e => {
                 if (e.target.classList.contains('eliminar')) {
-                    let fila = e.target.closest('tr');
-                    fila.remove();
-                    carrito = carrito.filter((_, i) => i != e.target.dataset.index);
-                    localStorage.setItem('carrito', JSON.stringify(carrito));
-                    actualizarTotalGeneral();
+                    let fila = e.target.closest('tr')
+                    fila.remove()
+                    carrito = carrito.filter((_, i) => i != e.target.dataset.index)
+                    localStorage.setItem('carrito', JSON.stringify(carrito))
+                    actualizarTotalGeneral()
+                    calcularIgv()
+                    calcularTotalConIgv()
                 }
             });
         });
