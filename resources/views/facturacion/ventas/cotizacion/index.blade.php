@@ -75,7 +75,9 @@
                                         </form>
                                         <button type="button"
                                                 class="px-2 py-1 bg-sky-500 text-sm rounded-full btn-cotiToFact"
-                                                data-id="{{ $cotizacion->id }}">
+                                                data-id="{{ $cotizacion->id }}"
+                                                data-codigo="{{ $cotizacion->cod_cotizacion }}"
+                                                >
                                             F
                                         </button>
                                     @endif
@@ -127,12 +129,14 @@
                 const cotizacionId = btn.dataset.id;
                 if (!cotizacionId) return;
 
+                const codigoCot = btn.dataset.codigo
+
                 Swal.fire({
-                    title: 'Convertir a factura',
-                    text: '¿Deseas convertir esta cotización a factura?',
+                    title: 'Facturar',
+                    text: `¿Deseas facturar esta cotización ${codigoCot}?`,
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Sí, convertir',
+                    confirmButtonText: 'Sí',
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -145,6 +149,4 @@
             });
         });
     </script>
-
-
 </x-app-layout>

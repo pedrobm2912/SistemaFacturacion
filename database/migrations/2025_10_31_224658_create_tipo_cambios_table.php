@@ -16,6 +16,7 @@ return new class extends Migration
             $table->decimal('valor_compra')->nullable();
             $table->decimal('valor_venta')->nullable();
             $table->decimal('valor_venta_banca');
+            $table->date('fecha');
             $table->timestamps();
         });
     }

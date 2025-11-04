@@ -13,7 +13,7 @@
                     <div class="flex gap-2 text-sm items-center">
                         <label for="cliente_id">Cliente:</label>
                         <select class="js-example-basic-single text-sm rounded-lg" name="cliente_id">
-                            <option value="">--Escoger un cliente--</option>
+                            <option value="" id="select-default">-- Escoger un cliente --</option>
                             @foreach($clientes as $cliente)
                                 <option value="{{ $cliente->id }}">{{ $cliente->nombres }} {{ $cliente->apellidos }} || {{ $cliente->ruc }}</option>
                             @endforeach
@@ -186,7 +186,9 @@
                 console.error('Formulario no encontrado.')
                 return
             }
-            if (carrito) localStorage.removeItem('carrito')
+            form.addEventListener('submit', function() {
+                localStorage.removeItem('carrito')
+            })
         })
     </script>
 </x-app-layout>

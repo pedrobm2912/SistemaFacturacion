@@ -8,6 +8,7 @@ use App\Models\CotizacionDetalle;
 use App\Models\Factura;
 use App\Models\FacturaDetalle;
 use App\Models\Producto;
+use App\Models\TipoCambio;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,11 +17,13 @@ class FacturaController extends Controller
 {
     public function index($cotizacion_id) {
         $cotizacion = Cotizacion::with(['cotizacion_detalles', 'cliente', 'user'])->findOrFail($cotizacion_id);
+        $tipoCambio = TipoCambio::orderBy('id', 'desc')->first();
 
-        // return $cotizacion;
+        // return [$cotizacion, $tipoCambio];
 
         return view("facturacion.comprobantes.facturas.proceso", [
-            "cotizacion" => $cotizacion
+            "cotizacion" => $cotizacion,
+            'tipoCambio' => $tipoCambio
         ]);
     }
 
