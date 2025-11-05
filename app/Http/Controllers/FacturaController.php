@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\CodeGenerator;
 use App\Models\Cotizacion;
 use App\Models\Factura;
-use App\Models\FacturaDetalle;
-use App\Models\Producto;
 use App\Models\TipoCambio;
 use App\Services\FacturacionService;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class FacturaController extends Controller
 {

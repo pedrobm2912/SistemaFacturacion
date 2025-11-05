@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\CodeGenerator;
 use App\Models\Cliente;
 use App\Models\Cotizacion;
-use App\Models\CotizacionDetalle;
-use App\Models\Factura;
-use App\Models\FacturaDetalle;
-use App\Models\Producto;
 use App\Services\CotizacionService;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CotizacionController extends Controller

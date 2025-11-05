@@ -20,7 +20,7 @@ class CotizacionService {
                 'total' => $data['total_con_igv'],
                 'dias_valido' => $data['dias_valido'],
                 'cliente_id' => $data['cliente_id'],
-                'user_id' => Auth::id()
+                'user_id' => Auth::user()->id
             ]);
 
             if (!empty($data['productos_id'])) {
