@@ -44,6 +44,7 @@ class CotizacionController extends Controller
 
     public function store(Request $request) {
         try {
+            // return $request->all();
 
             $this->cotizacionService->crearCotizacion($request->all());
 
