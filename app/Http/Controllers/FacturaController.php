@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CodeGenerator;
 use App\Models\Cotizacion;
-use App\Models\CotizacionDetalle;
 use App\Models\Factura;
 use App\Models\FacturaDetalle;
 use App\Models\Producto;
