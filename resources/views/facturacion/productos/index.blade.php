@@ -158,7 +158,7 @@
 
                     let carrito = JSON.parse(localStorage.getItem('carrito')) || []
 
-                    if (producto.stock < producto.cantidad) {
+                    if (producto.stock < producto.cantidad || producto.stock == 1) {
                         const contentError = document.getElementById('content-error')
                         contentError.classList.remove('hidden')
                         contentError.classList.add('opacity-100')

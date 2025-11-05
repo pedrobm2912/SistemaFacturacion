@@ -54,7 +54,7 @@ class CotizacionController extends Controller
             if ($request->has('productos_id')) {
                 foreach ($request->productos_id as $index => $producto_id) {
                     $producto = Producto::findOrFail($producto_id);
-                    if ($producto->stock < $request->cantidad[$index]) {
+                    if ($producto->stock < $request->cantidades[$index] || $producto->stock == 1) {
                         DB::rollBack();
                         return redirect()->back()->with('warning', 'No hay stock suficiente');
                     }
@@ -77,8 +77,7 @@ class CotizacionController extends Controller
         } catch (Exception $e) {
 
             DB::rollBack();
-            // dd($e->getMessage());
-            return redirect()->back()->with('error', $e->getMessage());
+            return $e;
             // return redirect()->back()->with('error', 'Error interno del servidor');
 
         }
