@@ -35,7 +35,8 @@ class CotizacionService {
         } catch (Exception $e) {
 
             DB::rollBack();
-            throw $e;
+            // throw $e;
+            throw new Exception('Error interno del servidor');
 
         }
     }
