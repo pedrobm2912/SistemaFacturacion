@@ -11,7 +11,8 @@
                         <tr class="text-sm">
                             <th>#</th>
                             <th>N° Cotización</th>
-                            <th>RUC / Razón Social</th>
+                            <th>RUC</th>
+                            <th>Razón Social</th>
                             <th>IGV</th>
                             <th>Total</th>
                             <th>Estado</th>
@@ -23,7 +24,8 @@
                             <tr class="text-sm">
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $cotizacion->cod_cotizacion }}</td></td>
-                                <td>{{ $cotizacion->cliente->ruc }} / {{ $cotizacion->cliente->razon_social }}</td>
+                                <td>{{ $cotizacion->cliente->ruc }}</td>
+                                <td>{{ $cotizacion->cliente->razon_social }}</td>
                                 <td>{{ $cotizacion->igv }}</td>
                                 <td>{{ $cotizacion->total }}</td>
                                 <td class="min-w-max">
@@ -81,10 +83,10 @@
                                         <form action="{{ route('proceso.factura', $cotizacion->id) }}" id="form-cotizacionFact-{{ $cotizacion->id }}" class="hidden" method="GET">
                                         </form>
                                         <button type="button"
-                                                class="px-2 py-1 bg-sky-500 text-sm rounded-full btn-cotiToFact"
-                                                data-id="{{ $cotizacion->id }}"
-                                                data-codigo="{{ $cotizacion->cod_cotizacion }}"
-                                                >
+                                            class="px-2 py-1 bg-sky-500 text-sm rounded-full btn-cotiToFact"
+                                            data-id="{{ $cotizacion->id }}"
+                                            data-codigo="{{ $cotizacion->cod_cotizacion }}"
+                                        >
                                             F
                                         </button>
                                     @elseif ($cotizacion->estado == 3)

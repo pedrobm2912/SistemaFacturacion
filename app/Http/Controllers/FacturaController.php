@@ -16,6 +16,16 @@ use Illuminate\Support\Facades\DB;
 
 class FacturaController extends Controller
 {
+    public function getFacturas() {
+        $facturas = Factura::with(['cotizacion', 'cliente', 'factura_detalles'])->get();
+
+        // return $facturas;
+
+        return view("facturacion.comprobantes.facturas.index", [
+            "facturas" => $facturas
+        ]);
+    }
+
     public function index($cotizacion_id) {
         $cotizacion = Cotizacion::with(['cotizacion_detalles', 'cliente', 'user'])->findOrFail($cotizacion_id);
         $tipoCambio = TipoCambio::orderBy('id', 'desc')->first();

@@ -76,6 +76,9 @@
 
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-4">
+                <div class="bg-red-300 p-2 hidden rounded-lg transition-opacity duration-500 opacity-0" id="content-error">
+                </div>
+
                 <table id="myTable" class="display w-full">
                     <thead>
                         <tr class="text-sm">
@@ -155,8 +158,27 @@
 
                     let carrito = JSON.parse(localStorage.getItem('carrito')) || []
 
-                    const existe = carrito.find(item => item.id === producto.id)
+                    if (producto.stock < producto.cantidad) {
+                        const contentError = document.getElementById('content-error')
+                        contentError.classList.remove('hidden')
+                        contentError.classList.add('opacity-100')
+                        contentError.innerHTML = `
+                            <span class="text-red-700 text-sm">No hay stock suficiente</span>
+                        `
 
+                        setTimeout(() => {
+                            contentError.classList.remove('opacity-100')
+                            contentError.classList.add('opacity-0')
+
+                            setTimeout(() => {
+                                contentError.classList.add('hidden')
+                            }, 1000)
+                        }, 3000)
+
+                        return ;
+                    }
+
+                    const existe = carrito.find(item => item.id === producto.id)
                     if (!existe) {
                         carrito.push(producto)
                     } else {

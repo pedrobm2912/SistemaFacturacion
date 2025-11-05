@@ -50,8 +50,15 @@ class CotizacionController extends Controller
                 'user_id' => Auth::user()->id
             ]);
 
+
             if ($request->has('productos_id')) {
                 foreach ($request->productos_id as $index => $producto_id) {
+                    $producto = Producto::findOrFail($producto_id);
+                    if ($producto->stock < $request->cantidad[$index]) {
+                        DB::rollBack();
+                        return redirect()->back()->with('warning', 'No hay stock suficiente');
+                    }
+
                     CotizacionDetalle::create([
                         'cotizacion_id' => $cotizacion->id,
                         'producto_id' => $producto_id,
@@ -61,12 +68,6 @@ class CotizacionController extends Controller
                         'desc1' => 0,
                         'desc2' => 0,
                     ]);
-
-                    // $producto = Producto::findOrFail($producto_id);
-
-                    // $producto->update([
-                    //     'stock' => $producto->stock - ($request->cantidades[$index] ?? 0)
-                    // ]);
                 }
             }
 

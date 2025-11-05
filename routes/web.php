@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/cotizacion/proceso', [CotizacionController::class, 'store'])->name('procesar.cotizacion');
     Route::patch('/cotizacion/{cotizacion_id}', [CotizacionController::class, 'changeStateCotizacion'])->name('changeState.cotizacion');
 
+    Route::get('/facturas', [FacturaController::class, 'getFacturas'])->name('facturas.index');
     Route::get('/facturas/{cotizacion_id}', [FacturaController::class, 'index'])->name('proceso.factura');
     Route::post('/facturas', [FacturaController::class, 'cotiToFact'])->name('cotizacion.factura');
 });
