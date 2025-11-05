@@ -12,6 +12,7 @@ use App\Models\TipoCambio;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class FacturaController extends Controller
 {
@@ -27,46 +28,56 @@ class FacturaController extends Controller
         ]);
     }
 
-    public function cotiToFact($cotizacion_id) {
+    public function cotiToFact(Request $request) {
         try {
 
-            $cotizacion = Cotizacion::findOrFail($cotizacion_id);
+            $cotizacion = Cotizacion::findOrFail($request->cotizacion_id);
 
+            DB::beginTransaction();
             $factura = Factura::create([
                 'cotizacion_id' => $cotizacion->id,
                 'cod_factura' => CodeGenerator::generate('FAC', Factura::class, 'cod_factura'),
-                'igv' => $cotizacion->igv,
+                'igv' => $request->igv,
                 'moneda' => 'soles',
-                'total' => $cotizacion->total,
+                'total' => $request->total_con_igv,
                 'cliente_id' => $cotizacion->cliente_id,
-                'user_id' => Auth::user()->id
+                'user_id' => Auth::user()->id,
+                'observaciones' => $request->observaciones
             ]);
 
-            $cotizacionProductos = CotizacionDetalle::where('cotizacion_id', $cotizacion->id)->get();
-            foreach ($cotizacionProductos as $detalle) {
+            foreach($request->detalles as $detalle) {
                 FacturaDetalle::create([
                     'factura_id' => $factura->id,
-                    'producto_id' => $detalle->producto_id,
-                    'subtotal' => $detalle->subtotal,
+                    'producto_id' => $detalle['producto_id'],
+                    'precio' => $detalle['precio'],
+                    'cantidad' => $detalle['cantidad'],
+                    'subtotal' => $detalle['subtotal'],
                     'desc1' => 0,
-                    'desc2' => 0,
-                    'precio' => $detalle->precio
+                    'desc2' => 0
                 ]);
 
-                $producto = Producto::findOrFail($detalle->producto_id);
-                if ($producto) {
-                    $producto->update([
-                        'stock' => $producto->stock - $detalle->cantidad
-                    ]);
+                // actualizar el stock de cada producto
+                if (isset($detalle['producto_id'])) {
+                    $producto = Producto::findOrFail($detalle['producto_id']);
+                    if ($producto) {
+                        $producto->decrement('stock', $detalle['cantidad']);
+                    }
                 }
             }
 
-            return redirect()->back()->with('success', 'Factura creada exitosamente');
+            // actualizar el estado de la cotizacion a facturada
+            $cotizacion->update([
+                'estado' => 3
+            ]);
+
+            DB::commit();
+            return redirect()->route('cotizaciones.index')->with('success', 'Factura creada exitosamente');
 
         } catch (Exception $e) {
-            dd($e->getMessage());
-            // return redirect()->back()->with('error', $e->getMessage());
-            // return redirect()->back()->with('error', 'Error interno del servidor');
+
+            DB::rollBack();
+            // return $e;
+            return redirect()->back()->with('error', 'Error interno del servidor');
 
         }
     }

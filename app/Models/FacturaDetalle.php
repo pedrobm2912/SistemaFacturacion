@@ -14,7 +14,6 @@ class FacturaDetalle extends Model
         'desc1',
         'desc2',
         'subtotal',
-        'igv',
         'producto_id',
         'factura_id'
     ];

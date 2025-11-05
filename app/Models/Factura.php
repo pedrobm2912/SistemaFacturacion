@@ -16,6 +16,7 @@ class Factura extends Model
         'total',
         'cotizacion_id',
         'cliente_id',
-        'user_id'
+        'user_id',
+        'observaciones'
     ];
 }

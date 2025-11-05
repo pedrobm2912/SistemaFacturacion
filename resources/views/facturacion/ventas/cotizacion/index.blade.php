@@ -42,6 +42,11 @@
                                             <div class="bg-green-500 w-2 h-full rounded-lg p-1"></div>
                                             <span class="text-green-500">Aceptado</span>
                                         </div>
+                                    @elseif ($cotizacion->estado == 3)
+                                        <div class="flex items-center gap-1 h-full">
+                                            <div class="bg-sky-500 w-2 h-full rounded-lg p-1"></div>
+                                            <span class="text-sky-500">Facturada</span>
+                                        </div>
                                     @endif
                                 </td>
 
@@ -52,19 +57,21 @@
                                         <input type="hidden" name="estado" id="input-estado-{{ $cotizacion->id }}">
                                     </form>
 
-                                    <select name="estado" class="text-xs cursor-pointer rounded-lg" id="valor-estado-{{ $cotizacion->id }}" value="" onchange="cambiarEstado({{ $cotizacion->id }})">
-                                        <option value="">-- Seleccionar estado --</option>
-                                        @if ($cotizacion->estado == 0)
-                                            <option value="1">Generar</option>
-                                            <option value="2">Aceptar</option>
-                                        @elseif ($cotizacion->estado == 1)
-                                            <option value="0">Anular</option>
-                                            <option value="2">Aceptar</option>
-                                        @elseif ($cotizacion->estado == 2)
-                                            <option value="0">Anular</option>
-                                            <option value="1">Generar</option>
-                                        @endif
-                                    </select>
+                                    @if ($cotizacion->estado !== 3)
+                                        <select name="estado" class="text-xs cursor-pointer rounded-lg" id="valor-estado-{{ $cotizacion->id }}" value="" onchange="cambiarEstado({{ $cotizacion->id }})">
+                                            <option value="">-- Seleccionar estado --</option>
+                                            @if ($cotizacion->estado == 0)
+                                                <option value="1">Generar</option>
+                                                <option value="2">Aceptar</option>
+                                            @elseif ($cotizacion->estado == 1)
+                                                <option value="0">Anular</option>
+                                                <option value="2">Aceptar</option>
+                                            @elseif ($cotizacion->estado == 2)
+                                                <option value="0">Anular</option>
+                                                <option value="1">Generar</option>
+                                            @endif
+                                        </select>
+                                    @endif
 
                                     @if ($cotizacion->estado == 2)
                                         <button class="px-2 py-1 bg-red-500 text-sm rounded-full">
@@ -79,6 +86,10 @@
                                                 data-codigo="{{ $cotizacion->cod_cotizacion }}"
                                                 >
                                             F
+                                        </button>
+                                    @elseif ($cotizacion->estado == 3)
+                                        <button class="px-2 py-1 bg-red-500 text-sm rounded-full">
+                                            G
                                         </button>
                                     @endif
                                 </td>

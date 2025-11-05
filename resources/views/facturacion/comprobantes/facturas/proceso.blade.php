@@ -21,50 +21,69 @@
 
                </div>
 
-                <div class="max-w-full mx-auto sm:px-6 lg:px-8 bg-white shadow-sm sm:rounded-lg p-4">
-                    <table id="tablaFactura" class="display w-full">
-                        <thead>
-                            <tr class="text-sm">
-                                <th>Código</th>
-                                <th>Descripción</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm">
-                            @foreach($cotizacion->cotizacion_detalles as $detalle)
+                <form action="{{ route('cotizacion.factura') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="cotizacion_id" value="{{ $cotizacion->id }}">
+
+                    <div class="max-w-full mx-auto sm:px-6 lg:px-8 bg-white shadow-sm sm:rounded-lg p-4">
+                        <label for="observaciones">Observaciones:</label>
+                        <textarea name="observaciones"></textarea>
+                        <table id="tablaFactura" class="display w-full">
+                            <thead>
                                 <tr class="text-sm">
-                                    <td>{{ $detalle->producto->codigo }}</td>
-                                    <td>{{ $detalle->producto->descripcion }}</td>
-                                    <td>{{ $detalle->precio }}</td>
-                                    <td>{{ $detalle->cantidad }}</td>
-                                    <td>{{ $detalle->subtotal }}</td>
+                                    <th>Código</th>
+                                    <th>Descripción</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
+                            </thead>
+                            <tbody class="text-sm">
+                                @foreach($cotizacion->cotizacion_detalles as $i => $detalle)
+                                    <tr class="text-sm">
+                                        <input type="hidden" name="detalles[{{ $i }}][producto_id]" value="{{ $detalle->producto_id }}">
 
-                        <tfoot>
-                            <tr class="text-sm">
-                                <th colspan="4" class="text-end">TOTAL GENERAL:</th>
-                                <th id="totalGeneral">0.00</th>
-                                <th></th>
-                            </tr>
-                            <tr class="text-sm">
-                                <th colspan="4" class="text-end">IGV:</th>
-                                <th id="igv">0.00</th>
-                                <th></th>
-                            </tr>
-                            <tr class="text-sm">
-                                <th colspan="4" class="text-end">Total con IGV:</th>
-                                <th id="totalConIgv">0.00</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-                    </table>
+                                        <td>{{ $detalle->producto->codigo }}</td>
+                                        <td>{{ $detalle->producto->descripcion }}</td>
+                                        <td>
+                                            <input type="number" name="detalles[{{ $i }}][precio]" value="{{ $detalle->precio }}" step="0.01" id="precio">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="detalles[{{ $i }}][cantidad]" value="{{ $detalle->cantidad }}" id="cantidad">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="detalles[{{ $i }}][subtotal]" value="" id="subtotal">
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
 
-                    <button class="px-3 py-2 bg-black/100 rounded-lg text-sm text-white" type="submit">Facturar</button>
-                </div>
+                            <tfoot>
+                                <tr class="text-sm">
+                                    <th colspan="3" class="text-end">TOTAL GENERAL:</th>
+                                    <th id="totalGeneral">0.00</th>
+                                    <th></th>
+                                </tr>
+                                <tr class="text-sm">
+                                    <th colspan="3" class="text-end">IGV:</th>
+                                    <th id="igv">0.00</th>
+                                    <th></th>
+                                </tr>
+                                <tr class="text-sm">
+                                    <th colspan="3" class="text-end">Total con IGV:</th>
+                                    <th id="totalConIgv">0.00</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        {{-- input oculto para enviarlo al backend --}}
+                        <input type="hidden" name="total_general" id="input-total-general">
+                        <input type="hidden" name="igv" id="input-igv">
+                        <input type="hidden" name="total_con_igv" id="input-total-con-igv">
+                        <button class="px-3 py-2 bg-black/100 rounded-lg text-sm text-white" type="submit">Facturar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -79,12 +98,74 @@
         document.addEventListener('DOMContentLoaded', function() {
             new DataTable('#tablaFactura')
 
+            // fecha
             const fecha = document.getElementById('fecha')
             const dateCurrent = new Date()
-
             const formato = dateCurrent.toISOString().split('T')[0]
-
             fecha.textContent = formato
+
+            // elementos para calcular valores
+            const filas = document.querySelectorAll('tbody tr')
+            const totalGeneral = document.getElementById('totalGeneral')
+            const totalIgv = document.getElementById('igv')
+            const totalConIgv = document.getElementById('totalConIgv')
+
+            const calcularTotalGeneral = () => {
+                let total = 0
+                const subtotales = document.querySelectorAll('input[name*="[subtotal]"]')
+                console.log(subtotales)
+                subtotales.forEach(input => {
+                    total += parseFloat(input.value) || 0
+                })
+                totalGeneral.textContent = total.toFixed(2)
+
+                const inputTotal = document.getElementById('input-total-general')
+                if (inputTotal) inputTotal.value = total.toFixed(2)
+            }
+
+            const calcularIgv = () => {
+                const igv = parseFloat(totalGeneral.textContent) * 0.18
+                totalIgv.textContent = igv.toFixed(2)
+
+                const inputIgv = document.getElementById('input-igv')
+                if (inputIgv) inputIgv.value = igv.toFixed(2)
+            }
+
+            const calcularTotalConIgv = () => {
+                const totalIgvTotales = parseFloat(totalGeneral.textContent) + parseFloat(totalIgv.textContent)
+                totalConIgv.textContent = totalIgvTotales.toFixed(2)
+
+                const inputTotalConIgv = document.getElementById('input-total-con-igv')
+                if (inputTotalConIgv) inputTotalConIgv.value = totalIgvTotales.toFixed(2)
+            }
+
+            const calcularTodo = () => {
+                calcularTotalGeneral()
+                calcularIgv()
+                calcularTotalConIgv()
+            }
+
+            filas.forEach(fila => {
+                const precioInput = fila.querySelector('input[name*="[precio]"]')
+                const cantidadInput = fila.querySelector('input[name*="[cantidad]"]')
+                const subtotalInput = fila.querySelector('input[name*="[subtotal]"]')
+
+                const reCalcularSubtotal = () => {
+                    const precio = parseFloat(precioInput.value) || 0
+                    const cantidad = parseInt(cantidadInput.value) || 0
+                    const subtotal = precio * cantidad
+
+                    subtotalInput.value = subtotal.toFixed(2)
+                    calcularTodo()
+                }
+
+                precioInput.addEventListener('input', reCalcularSubtotal)
+                cantidadInput.addEventListener('input', reCalcularSubtotal)
+
+                // al cargar la pagina, calcula instantaneamente
+                reCalcularSubtotal()
+            })
+
         })
     </script>
 </x-app-layout>

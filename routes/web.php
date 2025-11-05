@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/cotizacion/{cotizacion_id}', [CotizacionController::class, 'changeStateCotizacion'])->name('changeState.cotizacion');
 
     Route::get('/facturas/{cotizacion_id}', [FacturaController::class, 'index'])->name('proceso.factura');
-    Route::post('/facturas/{cotizacion_id}', [CotizacionController::class, 'cotiToFact'])->name('cotizacion.factura');
+    Route::post('/facturas', [FacturaController::class, 'cotiToFact'])->name('cotizacion.factura');
 });
 
 require __DIR__.'/auth.php';
