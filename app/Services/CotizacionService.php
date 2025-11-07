@@ -38,7 +38,8 @@ class CotizacionService {
         $cantidad = $data['cantidades'][$index];
 
         if ($producto->stock < $cantidad || $producto->stock <= 1) {
-            throw new Exception("No hay stock suficiente");
+            // throw new Exception("No hay stock suficiente");
+            return "No hay stock suficiente";
         }
 
         CotizacionDetalle::create([

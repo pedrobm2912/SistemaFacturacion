@@ -47,8 +47,8 @@ class CotizacionController extends Controller
         } catch (Exception $e) {
 
             DB::rollBack();
-            return $e;
-            // return redirect()->back()->with('error', 'Error interno del servidor');
+            // return $e;
+            return redirect()->back()->with('error', 'Error interno del servidor');
 
         }
     }
@@ -62,8 +62,8 @@ class CotizacionController extends Controller
 
         } catch (Exception $e) {
 
-            return $e;
-            // return redirect()->back()->with('error', 'Error interno del servidor');
+            // return $e;
+            return redirect()->back()->with('error', 'Error interno del servidor');
 
         }
     }
