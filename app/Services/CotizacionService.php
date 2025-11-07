@@ -13,32 +13,24 @@ use Illuminate\Support\Facades\DB;
 class CotizacionService {
     public function crearCotizacion(array $data) {
         DB::beginTransaction();
-        try {
-            $cotizacion = Cotizacion::create([
-                'cod_cotizacion' => CodeGenerator::generate('COT', Cotizacion::class, 'cod_cotizacion'),
-                'igv' => $data['igv'],
-                'total' => $data['total_con_igv'],
-                'dias_valido' => $data['dias_valido'],
-                'cliente_id' => $data['cliente_id'],
-                'user_id' => Auth::user()->id
-            ]);
 
-            if (!empty($data['productos_id'])) {
-                foreach ($data['productos_id'] as $index => $producto_id) {
-                    $this->crearDetalleCotizacion($cotizacion, $data, $index, $producto_id);
-                }
+        $cotizacion = Cotizacion::create([
+            'cod_cotizacion' => CodeGenerator::generate('COT', Cotizacion::class, 'cod_cotizacion'),
+            'igv' => $data['igv'],
+            'total' => $data['total_con_igv'],
+            'dias_valido' => $data['dias_valido'],
+            'cliente_id' => $data['cliente_id'],
+            'user_id' => Auth::user()->id
+        ]);
+
+        if (!empty($data['productos_id'])) {
+            foreach ($data['productos_id'] as $index => $producto_id) {
+                $this->crearDetalleCotizacion($cotizacion, $data, $index, $producto_id);
             }
-
-            DB::commit();
-            return $cotizacion;
-
-        } catch (Exception $e) {
-
-            DB::rollBack();
-            // throw $e;
-            throw new Exception('Error interno del servidor');
-
         }
+
+        DB::commit();
+        return $cotizacion;
     }
 
     protected function crearDetalleCotizacion(Cotizacion $cotizacion, array $data, $index, $producto_id) {
