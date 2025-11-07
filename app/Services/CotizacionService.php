@@ -13,33 +13,40 @@ use Illuminate\Support\Facades\DB;
 class CotizacionService {
     public function crearCotizacion(array $data) {
         DB::beginTransaction();
+        try {
+            $cotizacion = Cotizacion::create([
+                'cod_cotizacion' => CodeGenerator::generate('COT', Cotizacion::class, 'cod_cotizacion'),
+                'igv' => $data['igv'],
+                'total' => $data['total_con_igv'],
+                'dias_valido' => $data['dias_valido'],
+                'cliente_id' => $data['cliente_id'],
+                'user_id' => Auth::user()->id
+            ]);
 
-        $cotizacion = Cotizacion::create([
-            'cod_cotizacion' => CodeGenerator::generate('COT', Cotizacion::class, 'cod_cotizacion'),
-            'igv' => $data['igv'],
-            'total' => $data['total_con_igv'],
-            'dias_valido' => $data['dias_valido'],
-            'cliente_id' => $data['cliente_id'],
-            'user_id' => Auth::user()->id
-        ]);
-
-        if (!empty($data['productos_id'])) {
-            foreach ($data['productos_id'] as $index => $producto_id) {
-                $this->crearDetalleCotizacion($cotizacion, $data, $index, $producto_id);
+            if (!empty($data['productos_id'])) {
+                foreach ($data['productos_id'] as $index => $producto_id) {
+                    $this->crearDetalleCotizacion($cotizacion, $data, $index, $producto_id);
+                }
             }
-        }
 
-        DB::commit();
-        return $cotizacion;
+            DB::commit();
+            return $cotizacion;
+
+        } catch (Exception $e) {
+
+            DB::rollBack();
+            throw $e;
+
+        }
     }
 
     protected function crearDetalleCotizacion(Cotizacion $cotizacion, array $data, $index, $producto_id) {
         $producto = Producto::findOrFail($producto_id);
         $cantidad = $data['cantidades'][$index];
 
-        if ($producto->stock < $cantidad || $producto->stock <= 1) {
-            // throw new Exception("No hay stock suficiente");
-            return "No hay stock suficiente";
+        if ($producto->stock <= $cantidad) {
+            throw new Exception("No hay stock suficiente del producto $producto->codigo - $producto->descripcion");
+            // return redirect()->back()->with('error', 'No hay stock suficiente');
         }
 
         CotizacionDetalle::create([

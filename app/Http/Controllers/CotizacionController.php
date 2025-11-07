@@ -42,13 +42,14 @@ class CotizacionController extends Controller
 
             $this->cotizacionService->crearCotizacion($request->all());
 
-            return redirect()->route('proceso.cotizacion')->with('success', 'Cotización creada exitosamente');
+            return redirect()->route('cotizaciones.index')->with('success', 'Cotización creada exitosamente');
 
         } catch (Exception $e) {
 
             DB::rollBack();
             // return $e;
-            return redirect()->back()->with('error', 'Error interno del servidor');
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+            // return redirect()->back()->with('error', 'Error interno del servidor');
 
         }
     }

@@ -82,6 +82,7 @@
             });
         </script>
     @endpush
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
@@ -120,9 +121,10 @@
             });
 
             function calcularSubtotal(fila) {
-                const precio = parseFloat(fila.querySelector('.precio').value) || 0
-                const cantidad = parseInt(fila.querySelector('.cantidad').value) || 0
-                const subtotal = precio * cantidad
+                const precioInput = parseFloat(fila.querySelector('.precio'))
+                const cantidadInput = parseInt(fila.querySelector('.cantidad'))
+                if (!precioInput || !cantidadInput) return
+                const subtotal = precioInput.value * cantidadInput.value
                 fila.querySelector('.subtotal').value = subtotal.toFixed(2)
             }
 
@@ -190,5 +192,48 @@
                 localStorage.removeItem('carrito')
             })
         })
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+                Toastify({
+                    text: "{{ session('success') }}",
+                    duration: 2000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#65C748",
+                    }
+                }).showToast();
+            @endif
+
+            @if(session('error'))
+                Toastify({
+                    text: "{{ session('error') }}",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#ef4444",
+                    }
+                }).showToast();
+            @endif
+
+            @if(session('warning'))
+                Toastify({
+                    text: "{{ session('warning') }}",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: '#facc15'
+                    }
+                }).showToast();
+            @endif
+        });
     </script>
 </x-app-layout>

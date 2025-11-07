@@ -116,6 +116,50 @@
         </script>
     @endpush
 
+    {{-- toast notifications --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+                Toastify({
+                    text: "{{ session('success') }}",
+                    duration: 2000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#65C748"
+                    }
+                }).showToast();
+            @endif
+
+            @if(session('error'))
+                Toastify({
+                    text: "{{ session('error') }}",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#ef4444"
+                    }
+                }).showToast();
+            @endif
+
+            @if(session('warning'))
+                Toastify({
+                    text: "{{ session('warning') }}",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#facc15"
+                    }
+                }).showToast();
+            @endif
+        });
+    </script>
+
     <script>
         function cambiarEstado(cotizacionId) {
             const selectEstado = document.getElementById(`valor-estado-${cotizacionId}`)
